@@ -14,6 +14,18 @@ app.config.update(dict(
 
 app.config.from_envvar('BLOG_SETTINGS', silent=True)
 
+def init_db():
+    db = get_db()
+    with app.open_resource('schema.sql', mode='r') as f:
+        db.cursor().executescript(f.read())
+    db.commit()
+
+@app.cli.command('initdb')
+def initdb_command():
+    """Inits the db"""
+    init_db()
+    print("Init'd the DB")
+
 def connect_db():
     """Connects to the db"""
     rv = sqlite3.connect(app.config['DATABASE'])
